@@ -1,4 +1,7 @@
 ﻿<Window x:Class="WPF_Demo.MainWindow"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,8 +15,7 @@
         <ImageBrush Stretch="UniformToFill"/>
     </Window.Background>
     <Window.Resources>
-        <local:ValueAngleConverter x:Key="valueAngleConverter"/>
-        <local:ValueTextConverter x:Key="valueTextConverter"/>
+
 
         <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
         <Style x:Key="MyButtonStyle" TargetType="Button">
@@ -35,120 +37,91 @@
             </Setter>
         </Style>
 
+        <Style TargetType="Image">
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+        </Style>
+        
     </Window.Resources>
 
 
-    <Grid MouseMove="Ellipse_MouseMove" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" Margin="0,0,0,1" Background="#1D1D1D">
+    <Grid Name="myGrid" MouseMove="Ellipse_MouseMove" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" Margin="0,0,0,1" Background="#1D1D1D" MouseDown="myGrid_MouseDown">
 
 
         <Grid Name="songTracker" Margin="50,0,49,1">
-
+            
+            <!--Song track bar-->
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="300 " Height="300" >
-                <local:CircularProgressBar x:Name="wut" SegmentColor="#FF878889" StrokeThickness="26" Percentage="100" Radius="100" Margin="0,0,0,0" MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
-                <local:CircularProgressBar x:Name="wut2" Radius="100" Percentage="0" SegmentColor="green" StrokeThickness="26" Margin="0,0,0,0" MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                                           
-                                           
-                                           />
+                <local:CircularProgressBar 
+                    SegmentColor="#FF878889" 
+                    StrokeThickness="26" 
+                    Percentage="100" 
+                    Radius="100" 
+                    Margin="0,0,0,0" 
+                    MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" 
+                    MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+                
+                <local:CircularProgressBar 
+                    Radius="100" 
+                    Percentage="0" 
+                    SegmentColor="green" 
+                    StrokeThickness="26" 
+                    Margin="0,0,0,0" 
+                    MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                    MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
             </Grid>
-
-            <!--<Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="300 " Height="300">
-                <Slider Name="knob" Maximum="100" Value="0">
-                    <Slider.Template>
-                        <ControlTemplate>
-                            <Canvas Width="300" Height="300">
-                                <Ellipse Fill="Transparent" Width="300" Height="300" Canvas.Left="0" Canvas.Top="0" 
-                                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                MouseMove="Ellipse_MouseMove" MouseDown="Ellipse_MouseDown"/>
-                                <Canvas>
-                                    --><!--<Line Stroke="green" StrokeThickness="0" X1="150" Y1="63" X2="150" Y2="37"
-                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                    />-->
-                                    <!--<Ellipse Fill="green" Width="26" Height="26" Canvas.Left="137" Canvas.Top="37" 
-                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                    MouseLeftButtonUp="Ellipse_MouseLeftButtonUp">
-                                        <Ellipse.ToolTip>
-                                            <ToolTip>
-                                                <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                Path="Value" Converter="{StaticResource valueTextConverter}"/>
-                                            </ToolTip>
-                                        </Ellipse.ToolTip>
-                                    </Ellipse>--><!--
-                                    <Canvas.RenderTransform>
-                                        <RotateTransform CenterX="150" CenterY="150">
-                                            <RotateTransform.Angle>
-                                                <MultiBinding Converter="{StaticResource valueAngleConverter}">
-                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value"/>
-                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Minimum"/>
-                                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Maximum"/>
-                                                </MultiBinding>
-                                            </RotateTransform.Angle>
-                                        </RotateTransform>
-                                    </Canvas.RenderTransform>
-                                </Canvas>
-                            </Canvas>
-
-                        </ControlTemplate>
-                    </Slider.Template>
-                </Slider>
-
-            </Grid>-->
 
             <Button Name="playStopBtn" Margin="316,161,313,167" Background="{x:Null}" Style="{StaticResource MyButtonStyle}" Height="69">
                 <StackPanel Height="54" Width="46">
                     <Image Name="playStopImage" Source="Resources/Play.png" Stretch="UniformToFill" MouseLeftButtonDown="playStopImage_MouseLeftButtonDown"/>
                 </StackPanel>
             </Button>
+
         </Grid>
 
+        
+        
+        <!--User volume bar-->
+        <Grid Name="userVolume" Margin="50,0,509,1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200 " Height="200">
+            <local:CircularProgressBar 
+                SegmentColor="#FF878889" 
+                StrokeThickness="26" 
+                Percentage="100" 
+                Radius="50" 
+                MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"  
+                MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
 
-        <!--
-        <Slider x:Name="knob" Maximum="100" Value="60" Margin="0,0,0,0" Width="300" Height="300">
-            <Slider.Template>
-                <ControlTemplate>
-                    <Viewbox>
-                        <Canvas Name="canvas1" Width="250" Height="250" Margin="0">
-                            <Ellipse Fill="Transparent" Width="225" Height="225" Canvas.Left="25" Canvas.Top="7.5" 
-                
-                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                MouseMove="Ellipse_MouseMove" MouseDown="Ellipse_MouseDown"/>
+            <local:CircularProgressBar 
+                Radius="50" Percentage="0" 
+                SegmentColor="#FF113A83" 
+                StrokeThickness="27" 
+                MouseDown="Ellipse_MouseDown" 
+                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" MouseMove="Ellipse_MouseMove" 
+                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" />
 
-                            <Canvas Name="canvas2">
-                                
-                                <Line Stroke="Red" StrokeThickness="5" X1="150" Y1="150" X2="150" Y2="10"
-                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"/>
-                                
-                                <Ellipse Fill="Red" Width="25" Height="25" Canvas.Left="140" Canvas.Top="0" 
-                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                    MouseLeftButtonUp="Ellipse_MouseLeftButtonUp">
-                                    <Ellipse.ToolTip>
-                                        <ToolTip>
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                Path="Value" Converter="{StaticResource valueTextConverter}"/>
-                                        </ToolTip>
-                                    </Ellipse.ToolTip>
-                                </Ellipse>
-                                <Canvas.RenderTransform>
-                                    <RotateTransform CenterX="150" CenterY="150">
-                                        <RotateTransform.Angle>
-                                            <MultiBinding Converter="{StaticResource valueAngleConverter}">
-                                                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value"/>
-                                                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Minimum"/>
-                                                <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Maximum"/>
-                                            </MultiBinding>
-                                        </RotateTransform.Angle>
-                                    </RotateTransform>
-                                </Canvas.RenderTransform>
-                            </Canvas>
-                        </Canvas>
-                    </Viewbox>
-                </ControlTemplate>
-            </Slider.Template>
-        </Slider> -->
-
-
-
-
+        </Grid>
+        <Image Source="Resources/userVolumeIcon.png" Margin="151,186,610,191" />
+        
+        <!--Othes volume bar-->
+       <Grid Name="othersVolume" Margin="530,98,68,100" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200 " Height="200" >
+             <local:CircularProgressBar 
+                 SegmentColor="#FF878889" 
+                 StrokeThickness="26" 
+                 Percentage="100" 
+                 Radius="50" 
+                 Margin="0,0,0,0" 
+                 MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"    
+                 MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+           
+            <local:CircularProgressBar 
+                Radius="50" 
+                Percentage="0" 
+                SegmentColor="#FF113A83" 
+                StrokeThickness="27" 
+                Margin="0,0,0,0" 
+                MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" />
+        </Grid>
+        <Image Source="Resources/otherUsersVolumeIcon.png" Margin="607,184,146,188" />
+        
     </Grid>
 </Window>

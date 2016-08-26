@@ -21,33 +21,40 @@ namespace WPF_Demo
         public MainWindow()
         {
             InitializeComponent();
+            CircularProgressBar userVolumeProgress = (CircularProgressBar)userVolume.Children[1];
+            CircularProgressBar othersVolumeProgress = (CircularProgressBar)othersVolume.Children[1];
+            userVolumeProgress.Percentage = othersVolumeProgress.Percentage = 25;
         }
         private bool _isPlaying = true;
         private bool _isPressed = false;
+        private IInputElement _scrollBarSource = null;
         private Canvas _templateCanvas = null;
 
         private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Enable moving mouse to change the value.
             _isPressed = true;
+            _scrollBarSource = (IInputElement)e.Source;
         }
 
         private void Ellipse_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //Disable moving mouse to change the value.
             _isPressed = false;
+            _scrollBarSource = null;
         }
 
         private void Ellipse_MouseMove(object sender, MouseEventArgs e)
         {
             if (_isPressed)
             {
+               
+                CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
+                Grid barParentGrid = (Grid)bar.Parent;
+                CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
 
-                //Canculate the current rotation angle and set the value.
-                const double RADIUS = 150;
-                Point newPos = e.GetPosition(wut);
-                double angle = MyHelper.GetAngleR(newPos, RADIUS);
-                wut2.Percentage = (100) * angle / (2 * Math.PI);
+                double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
+                progressBar.Percentage = (100) * angle / (2 * Math.PI);
                 
             }
         }
@@ -55,12 +62,13 @@ namespace WPF_Demo
         private void Ellipse_MouseDown(object sender, MouseButtonEventArgs e)
         {
             _isPressed = true;
-            const double RADIUS = 150;
-            Console.WriteLine(Mouse.GetPosition(wut));
-            double angle = MyHelper.GetAngleR(Mouse.GetPosition(wut), RADIUS);
-            wut2.Percentage = (100) * angle / (2 * Math.PI);
-        }
 
+            CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
+            Grid barParentGrid = (Grid)bar.Parent;
+            CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
+            double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
+            progressBar.Percentage = (100) * angle / (2 * Math.PI);
+        }
 
         private void playStopImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -77,86 +85,7 @@ namespace WPF_Demo
                 
             }
         }
-    }
 
-    //The converter used to convert the value to the rotation angle.
-    public class ValueAngleConverter : IMultiValueConverter
-    {
-        #region IMultiValueConverter Members
-
-        public object Convert(object[] values, Type targetType, object parameter,
-                      System.Globalization.CultureInfo culture)
-        {
-            double value = (double)values[0];
-            double minimum = (double)values[1];
-            double maximum = (double)values[2];
-
-            return MyHelper.GetAngle(value, maximum, minimum);
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter,
-              System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-    }
-
-    //Convert the value to text.
-    public class ValueTextConverter : IValueConverter
-    {
-
-        #region IValueConverter Members
-
-        public object Convert(object value, Type targetType, object parameter,
-                  System.Globalization.CultureInfo culture)
-        {
-            double v = (double)value;
-            return String.Format("{0:F2}", v);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-    }
-
-    public static class MyHelper
-    {
-        //Get the parent of an item.
-        public static T FindParent<T>(FrameworkElement current)
-          where T : FrameworkElement
-        {
-            do
-            {
-                if (current != null)
-                {
-                    current = VisualTreeHelper.GetParent(current) as FrameworkElement;
-                    if (current is T)
-                    {
-                        return (T)current;
-                    }
-                }
-            }
-            while (current != null);
-            return null;
-        }
-
-        //Get the rotation angle from the value
-        public static double GetAngle(double value, double maximum, double minimum)
-        {
-            double current = (value / (maximum - minimum)) * 360;
-            if (current == 360)
-                current = 359.999;
-
-            return current;
-        }
-
-        //Get the rotation angle from the position of the mouse
         public static double GetAngleR(Point pos, double radius)
         {
             //Calculate out the distance(r) between the center and the position
@@ -167,7 +96,6 @@ namespace WPF_Demo
 
             //Calculate the angle
             double angle = Math.Acos((center.Y - pos.Y) / r);
-            //Console.WriteLine("r:{0},y:{1},angle:{2}.", r, pos.Y, angle);
             if (pos.X < radius)
                 angle = 2 * Math.PI - angle;
             if (Double.IsNaN(angle))
@@ -175,5 +103,68 @@ namespace WPF_Demo
             else
                 return angle;
         }
+
+        /// <summary>
+        /// Drag the window when the mouse button is down anywhere on the grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void myGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+            if (e.Source is Grid)
+            {
+                Grid sourceGrid = (Grid)e.Source;
+                if (sourceGrid.Name == "myGrid")
+                    if (e.ChangedButton == MouseButton.Left)
+                        this.DragMove();
+            }
+        }
     }
+
+    ////The converter used to convert the value to the rotation angle.
+    //public class ValueAngleConverter : IMultiValueConverter
+    //{
+    //    #region IMultiValueConverter Members
+
+    //    public object Convert(object[] values, Type targetType, object parameter,
+    //                  System.Globalization.CultureInfo culture)
+    //    {
+    //        double value = (double)values[0];
+    //        double minimum = (double)values[1];
+    //        double maximum = (double)values[2];
+
+    //        return MyHelper.GetAngle(value, maximum, minimum);
+    //    }
+
+    //    public object[] ConvertBack(object value, Type[] targetTypes, object parameter,
+    //          System.Globalization.CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    #endregion
+    //}
+
+    ////Convert the value to text.
+    //public class ValueTextConverter : IValueConverter
+    //{
+
+    //    #region IValueConverter Members
+
+    //    public object Convert(object value, Type targetType, object parameter,
+    //              System.Globalization.CultureInfo culture)
+    //    {
+    //        double v = (double)value;
+    //        return String.Format("{0:F2}", v);
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter,
+    //        System.Globalization.CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    #endregion
+    //}
 }

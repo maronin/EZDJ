@@ -107,6 +107,9 @@
     <Content Include="Resources\backgroundImage.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\userVolumeIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\addMusicIcon.png">
@@ -169,6 +172,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\otherUsersVolumeIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\Pause.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
