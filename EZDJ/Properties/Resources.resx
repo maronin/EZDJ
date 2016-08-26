@@ -190,4 +190,34 @@
   <data name="userVolumeIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\userVolumeIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="_999999_dj_128" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-128.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-24.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_256" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-256.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-32.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-48.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_512" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-512.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_999999_dj_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\999999-dj-ico\999999-dj-64.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="mic" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mic.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="speaker" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\speaker.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

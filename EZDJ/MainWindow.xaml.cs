@@ -27,6 +27,7 @@ namespace WPF_Demo
         }
         private bool _isPlaying = true;
         private bool _isPressed = false;
+        private bool _settingsOpen = false;
         private IInputElement _scrollBarSource = null;
         private Canvas _templateCanvas = null;
 
@@ -115,10 +116,42 @@ namespace WPF_Demo
             if (e.Source is Grid)
             {
                 Grid sourceGrid = (Grid)e.Source;
-                if (sourceGrid.Name == "myGrid")
+                if (sourceGrid.Name == "mainGrid")
                     if (e.ChangedButton == MouseButton.Left)
                         this.DragMove();
             }
+        }
+
+        private void closeApp(object sender, MouseButtonEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void openSettings(object sender, MouseButtonEventArgs e)
+        {
+            if (!_settingsOpen)
+            {
+                settingsIcon.Source = new BitmapImage(new Uri(@"Resources/backArrow.png", UriKind.RelativeOrAbsolute));
+                _settingsOpen = true;
+                showSettings();
+            }
+            else
+            {
+                settingsIcon.Source = new BitmapImage(new Uri(@"Resources/settings-icon.png", UriKind.RelativeOrAbsolute));
+                _settingsOpen = false;
+                hideSettings();
+                
+            }
+        }
+
+        private void showSettings()
+        {
+            settingsGrid.Visibility = Visibility.Visible;
+        }
+
+        private void hideSettings()
+        {
+            settingsGrid.Visibility = Visibility.Collapsed;
         }
     }
 
