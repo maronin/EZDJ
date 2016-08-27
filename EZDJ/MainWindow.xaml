@@ -131,7 +131,6 @@
 
             </ListView>
             <Image Source="Resources/addMusicIcon.png" x:Name="addSongBtn" MouseLeftButtonDown="btnOpenFile_Click" HorizontalAlignment="Left" Height="41" Margin="743,360,0,0" VerticalAlignment="Top" Width="41" Cursor="Hand"/>
-            <local:CircularProgressBar HorizontalAlignment="Left" Margin="525,-40,0,0" VerticalAlignment="Top" BackgroundColor="#FF0A67C5" SegmentColor="#FF08B29B" Width="269" Height="238"/>
 
         </Grid>
     </Border>
