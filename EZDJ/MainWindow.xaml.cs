@@ -261,12 +261,14 @@ namespace EZDJ
         /// </summary>
         public void setProgressBarPercentage()
         {
+
             CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
             Grid barParentGrid = (Grid)bar.Parent;
             CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
 
             double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
-            progressBar.Percentage = (100) * angle / (2 * Math.PI);
+            if (musicPlayer.streamExists() || barParentGrid.Name != "songProgressBarGrid")
+                progressBar.Percentage = (100) * angle / (2 * Math.PI);
 
         }
 
@@ -297,10 +299,10 @@ namespace EZDJ
         /// Set the song progress bar to the proper time based on the percentage.
         /// </summary>
         public void setProgressBarTime()
-        {
-            songProgressBar.timeProgress = (songProgressBar.Percentage / 100) * musicPlayer.getTotalSongSeconds();
+        {            
             if (musicPlayer.streamExists())
             {
+                songProgressBar.timeProgress = (songProgressBar.Percentage / 100) * musicPlayer.getTotalSongSeconds();
                 musicPlayer.setCurrentTime(songProgressBar.timeProgress);
             }
         }

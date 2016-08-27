@@ -67,7 +67,7 @@
 
             <Grid Margin="50,-40,49,1">
                 <!--Song track bar-->
-                <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="300 " Height="300" >
+                <Grid Name="songProgressBarGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300 " Height="300" >
                     <local:CircularProgressBar 
                     x:Name="songProgressBarBackground"
                     SegmentColor="#FF878889" 
