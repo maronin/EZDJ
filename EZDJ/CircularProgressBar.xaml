@@ -5,14 +5,42 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EZDJ"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="500">
+             SizeChanged="UserControl_SizeChanged"
+             d:DesignHeight="500" d:DesignWidth="500" Width="200" Height="200">
+    
     <Grid>
+
+        <Path x:Name="backGroundPathRoot" Stroke="{Binding BackgroundColor, ElementName=userControl}" 
+          StrokeThickness="{Binding StrokeThickness, ElementName=userControl}" >
+            
+            <Path.Data>
+                <PathGeometry>
+                    <PathGeometry.Figures>
+                        <PathFigureCollection>
+
+                            <PathFigure x:Name="pathBackgroundFigure">
+                                <PathFigure.Segments>
+                                    <PathSegmentCollection>
+                                        <ArcSegment x:Name="arcBackgroundSegment" SweepDirection="Clockwise" />
+                                    </PathSegmentCollection>
+                                </PathFigure.Segments>
+                            </PathFigure>
+
+                        </PathFigureCollection>
+                    </PathGeometry.Figures>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+
+
+
         <Path x:Name="pathRoot" Stroke="{Binding SegmentColor, ElementName=userControl}" 
           StrokeThickness="{Binding StrokeThickness, ElementName=userControl}" >
             <Path.Data>
                 <PathGeometry>
                     <PathGeometry.Figures>
                         <PathFigureCollection>
+
                             <PathFigure x:Name="pathFigure">
                                 <PathFigure.Segments>
                                     <PathSegmentCollection>
@@ -20,10 +48,12 @@
                                     </PathSegmentCollection>
                                 </PathFigure.Segments>
                             </PathFigure>
+
                         </PathFigureCollection>
                     </PathGeometry.Figures>
                 </PathGeometry>
             </Path.Data>
         </Path>
+
     </Grid>
 </UserControl>

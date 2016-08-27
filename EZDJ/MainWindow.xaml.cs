@@ -75,8 +75,8 @@ namespace EZDJ
 
             songProgressBar.MouseMove += songProgressBar_MouseMove;
             songProgressBar.MouseLeftButtonDown += songProgressBar_MouseLeftButtonDown;
-            songProgressBarBackground.MouseLeftButtonDown += songProgressBar_MouseLeftButtonDown;
-            songProgressBarBackground.MouseMove += songProgressBar_MouseMove;
+            //songProgressBarBackground.MouseLeftButtonDown += songProgressBar_MouseLeftButtonDown;
+            //songProgressBarBackground.MouseMove += songProgressBar_MouseMove;
 
             mainGrid.MouseMove += songProgressBar_MouseMove;
 
@@ -197,9 +197,7 @@ namespace EZDJ
         /// </summary>
         private void InitializeVolumeBars()
         {
-            CircularProgressBar userVolumeProgress = (CircularProgressBar)userVolumeGrid.Children[1];
-            CircularProgressBar othersVolumeProgress = (CircularProgressBar)othersVolumeGrid.Children[1];
-            userVolumeProgress.Percentage = othersVolumeProgress.Percentage = 25;
+            userVolume.Percentage = othersVolume.Percentage = 25;
         }
 
         /// <summary>
@@ -261,14 +259,10 @@ namespace EZDJ
         /// </summary>
         public void setProgressBarPercentage()
         {
-
             CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
-            Grid barParentGrid = (Grid)bar.Parent;
-            CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
-
             double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
-            if (musicPlayer.streamExists() || barParentGrid.Name != "songProgressBarGrid")
-                progressBar.Percentage = (100) * angle / (2 * Math.PI);
+            if (musicPlayer.streamExists() || bar.Name != "songProgressBar")
+                bar.Percentage = (100) * angle / (2 * Math.PI);
 
         }
 
@@ -279,7 +273,8 @@ namespace EZDJ
         /// <param name="e"></param>
         public void songProgressBar_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isPressed)
+            CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
+            if (_isPressed && bar.Name == "songProgressBar")
             {
                 setProgressBarTime();
             }

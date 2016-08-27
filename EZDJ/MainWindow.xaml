@@ -10,7 +10,7 @@
         xmlns:local="clr-namespace:EZDJ"
         AllowsTransparency="True"       
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="805.548">
+        Title="MainWindow" Height="800" Width="805.548">
 
     <Window.Background>
         <ImageBrush Stretch="UniformToFill"/>
@@ -46,20 +46,20 @@
 
     <Border Background="#1D1D1D" CornerRadius="5" Padding="6">
 
-        <Grid Name="mainGrid" MouseMove="progressBar_MouseMove" MouseLeftButtonUp="progressBar_MouseLeftButtonUp" Margin="0,0,0,0" Background="Transparent" MouseDown="myGrid_MouseDown">
+        <Grid Name="mainGrid" MouseMove="progressBar_MouseMove" MouseLeftButtonUp="progressBar_MouseLeftButtonUp" Margin="0,0,0,300" Background="Transparent" MouseDown="myGrid_MouseDown">
 
-            <Grid Name="settingsGrid" Panel.ZIndex="1000" Visibility="Collapsed" Margin="10,77,10,10">
+            <Grid Name="settingsGrid" Panel.ZIndex="1000" Visibility="Collapsed" Margin="10,31,10,82">
                 <Grid.Background>
                     <SolidColorBrush Color="#1D1D1D" Opacity="1"/>
                 </Grid.Background>
                 <!--Input devices-->
-                <ComboBox x:Name="cbInputDevices" HorizontalAlignment="Left" Margin="59,161,0,0" VerticalAlignment="Top" Width="120" Style="{StaticResource ComboBoxFlatStyle}" />
+                <ComboBox x:Name="cbInputDevices" HorizontalAlignment="Left" Margin="100,224,0,0" VerticalAlignment="Top" Width="120" Style="{StaticResource ComboBoxFlatStyle}" />
                 <!--Output devices-->
-                <ComboBox x:Name="cbOutputDevices" HorizontalAlignment="Left" Margin="287,161,0,0" VerticalAlignment="Top" Width="120" Style="{StaticResource ComboBoxFlatStyle}" />
+                <ComboBox x:Name="cbOutputDevices" HorizontalAlignment="Left" Margin="328,224,0,0" VerticalAlignment="Top" Width="120" Style="{StaticResource ComboBoxFlatStyle}" />
                 <!--Music output-->
-                <ComboBox x:Name="cbMusicOutput" HorizontalAlignment="Left" Margin="520,161,0,0" VerticalAlignment="Top" Width="120" Style="{StaticResource ComboBoxFlatStyle}" />
-                <Image x:Name="image" HorizontalAlignment="Left" Height="79" Margin="82,82,0,0" VerticalAlignment="Top" Width="72" Source="Resources/mic.png"/>
-                <Image x:Name="image_Copy" HorizontalAlignment="Left" Height="79" Margin="545,82,0,0" VerticalAlignment="Top" Width="72" Source="Resources/speaker.png"/>
+                <ComboBox x:Name="cbMusicOutput" HorizontalAlignment="Left" Margin="560,224,0,0" VerticalAlignment="Top" Width="120" Style="{StaticResource ComboBoxFlatStyle}" />
+                <Image x:Name="image" HorizontalAlignment="Left" Height="79" Margin="122,145,0,0" VerticalAlignment="Top" Width="72" Source="Resources/mic.png"/>
+                <Image x:Name="image_Copy" HorizontalAlignment="Left" Height="79" Margin="586,145,0,0" VerticalAlignment="Top" Width="72" Source="Resources/speaker.png"/>
 
             </Grid>
 
@@ -67,26 +67,18 @@
 
             <Grid Margin="50,-40,49,1">
                 <!--Song track bar-->
-                <Grid Name="songProgressBarGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300 " Height="300" >
-                    <local:CircularProgressBar 
-                    x:Name="songProgressBarBackground"
-                    SegmentColor="#FF878889" 
-                    StrokeThickness="26" 
-                    Percentage="100" 
-                    Radius="100" 
-                    Margin="0,0,0,0" 
-                    MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp" 
-                    MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
+                <Grid Name="songProgressBarGrid" HorizontalAlignment="Center" VerticalAlignment="Center"  >
 
                     <local:CircularProgressBar 
                     x:Name="songProgressBar"
                     Radius="100" 
                     Percentage="0" 
-                    SegmentColor="green" 
+                    SegmentColor="green"
+                    BackgroundColor="#FF878889"
                     StrokeThickness="26" 
                     Margin="0,0,0,0" 
                     MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"
-                    MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
+                    MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown" Width="300 " Height="300"/>
                     <TextBlock x:Name="currentTrackTime" HorizontalAlignment="Left" Margin="114,271,0,0" TextWrapping="Wrap" Text="--:--" VerticalAlignment="Top" Width="71" FontSize="22" Foreground="#FFE4E4E4" TextAlignment="Center" Height="24" FontWeight="Bold"/>
                     <TextBlock x:Name="totalTrackTime" HorizontalAlignment="Left" Margin="114,305,0,-27" TextWrapping="Wrap" Text="--:--" VerticalAlignment="Top" Width="71" FontSize="16" Foreground="#FFE4E4E4" TextAlignment="Center" Height="22"/>
                 </Grid>
@@ -95,66 +87,51 @@
 
             </Grid>
 
-
-
             <!--User volume bar-->
-            <Grid Name="userVolumeGrid" Margin="50,-40,509,1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200 " Height="200">
-                <local:CircularProgressBar 
-                SegmentColor="#FF878889" 
-                StrokeThickness="26" 
-                Percentage="100" 
-                Radius="50" 
-                MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"  
-                MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
+            <Grid Name="userVolumeGrid" Margin="50,-40,509,1" HorizontalAlignment="Center" VerticalAlignment="Center" >
 
                 <local:CircularProgressBar 
                 x:Name="userVolume"
+                BackgroundColor="#FF878889"
                 Radius="50" Percentage="0" 
                 SegmentColor="#FF113A83" 
                 StrokeThickness="27" 
                 MouseDown="progressBar_MouseDown" 
                 MouseLeftButtonUp="progressBar_MouseLeftButtonUp" MouseMove="progressBar_MouseMove" 
-                MouseLeftButtonDown="progressBar_MouseLeftButtonDown" />
-
+                MouseLeftButtonDown="progressBar_MouseLeftButtonDown" Width="200 " Height="200"/>
             </Grid>
             <Image Source="Resources/userVolumeIcon.png" Margin="151,146,610,191" />
 
             <!--Others volume bar-->
-            <Grid Name="othersVolumeGrid" Margin="530,58,68,100" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200 " Height="200" >
-                <local:CircularProgressBar 
-                 
-                 SegmentColor="#FF878889" 
-                 StrokeThickness="26" 
-                 Percentage="100" 
-                 Radius="50" 
-                 Margin="0,0,0,0" 
-                 MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"    
-                 MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
-
+            <Grid Name="othersVolumeGrid" Margin="530,58,68,100" HorizontalAlignment="Center" VerticalAlignment="Center" >
                 <local:CircularProgressBar
-                    x:Name="othersVolume"
+                x:Name="othersVolume"
+                BackgroundColor="#FF878889"
                 Radius="50" 
                 Percentage="0" 
                 SegmentColor="#FF113A83" 
-                StrokeThickness="27" 
+                StrokeThickness="26" 
                 Margin="0,0,0,0" 
                 MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"
-                MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown" />
+                MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"  Width="200" Height="200"/>
             </Grid>
             <Image Source="Resources/otherUsersVolumeIcon.png" Margin="607,144,146,188" />
             <Image  Margin="10,10,768,462"  x:Name="settingsIcon" Source="Resources/settings-icon.png" Stretch="UniformToFill" MouseLeftButtonDown="openSettings" Height="16" Cursor="Hand" RenderTransformOrigin="-40.219,0.125"/>
 
-            <ListView x:Name="playList" HorizontalAlignment="Left" Height="72" Margin="10,406,0,0" VerticalAlignment="Top" Width="774" FontSize="20" Foreground="#FFD2D2D2" ScrollViewer.VerticalScrollBarVisibility="Hidden" Background="Transparent" BorderThickness="0" >
+            <ListView x:Name="playList" HorizontalAlignment="Left" Height="365" Margin="10,411,0,-288" VerticalAlignment="Top" Width="774" FontSize="20" Foreground="#FFD2D2D2" ScrollViewer.VerticalScrollBarVisibility="Hidden" Background="Transparent" BorderThickness="0" >
 
                 <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
+                    <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Background" Value="#202020"/>
                     </Style>
+
                 </ListView.ItemContainerStyle>
 
 
             </ListView>
             <Image Source="Resources/addMusicIcon.png" x:Name="addSongBtn" MouseLeftButtonDown="btnOpenFile_Click" HorizontalAlignment="Left" Height="41" Margin="743,360,0,0" VerticalAlignment="Top" Width="41" Cursor="Hand"/>
+            <local:CircularProgressBar HorizontalAlignment="Left" Margin="525,-40,0,0" VerticalAlignment="Top" BackgroundColor="#FF0A67C5" SegmentColor="#FF08B29B" Width="269" Height="238"/>
 
         </Grid>
     </Border>
