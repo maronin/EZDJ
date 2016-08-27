@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace WPF_Demo
+namespace EZDJ
 {
     /// <summary>
     /// Interaction logic for CircularProgressBar.xaml
@@ -25,6 +25,13 @@ namespace WPF_Demo
             InitializeComponent();
             Angle = (Percentage * 360) / 100;
             RenderArc();
+        }
+
+        //in seconds
+        public double timeProgress
+        {
+            get { return (double)GetValue(timeProgressProperty);  }
+            set { SetValue(timeProgressProperty, value);  }
         }
 
         public int Radius
@@ -57,6 +64,9 @@ namespace WPF_Demo
             set { SetValue(AngleProperty, value); }
         }
 
+        public static readonly DependencyProperty timeProgressProperty =
+            DependencyProperty.Register("timeProgress", typeof(double), typeof(CircularProgressBar), new PropertyMetadata(65d, new PropertyChangedCallback(onTimeProgressChanged)));
+
         // Using a DependencyProperty as the backing store for Percentage.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PercentageProperty =
             DependencyProperty.Register("Percentage", typeof(double), typeof(CircularProgressBar), new PropertyMetadata(65d, new PropertyChangedCallback(OnPercentageChanged)));
@@ -81,6 +91,11 @@ namespace WPF_Demo
         {
             CircularProgressBar circle = sender as CircularProgressBar;
             circle.set_Color((SolidColorBrush)args.NewValue);
+        }
+
+        private static void onTimeProgressChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+        {
+
         }
 
         private static void OnThicknessChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)

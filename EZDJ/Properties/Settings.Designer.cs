@@ -22,5 +22,41 @@ namespace EZDJ.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int micInputIndex {
+            get {
+                return ((int)(this["micInputIndex"]));
+            }
+            set {
+                this["micInputIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int micOutputIndex {
+            get {
+                return ((int)(this["micOutputIndex"]));
+            }
+            set {
+                this["micOutputIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int musicOutputIndex {
+            get {
+                return ((int)(this["musicOutputIndex"]));
+            }
+            set {
+                this["musicOutputIndex"] = value;
+            }
+        }
     }
 }

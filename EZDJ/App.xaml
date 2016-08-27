@@ -1,7 +1,7 @@
-﻿<Application x:Class="WPF_Demo.App"
+﻿<Application x:Class="EZDJ.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WPF_Demo"
+             xmlns:local="clr-namespace:EZDJ"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
