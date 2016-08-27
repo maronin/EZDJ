@@ -46,7 +46,7 @@
 
     <Border Background="#1D1D1D" CornerRadius="5" Padding="6">
 
-        <Grid Name="mainGrid" MouseMove="Ellipse_MouseMove" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" Margin="0,0,0,0" Background="Transparent" MouseDown="myGrid_MouseDown">
+        <Grid Name="mainGrid" MouseMove="progressBar_MouseMove" MouseLeftButtonUp="progressBar_MouseLeftButtonUp" Margin="0,0,0,0" Background="Transparent" MouseDown="myGrid_MouseDown">
 
             <Grid Name="settingsGrid" Panel.ZIndex="1000" Visibility="Collapsed" Margin="10,77,10,10">
                 <Grid.Background>
@@ -69,14 +69,14 @@
                 <!--Song track bar-->
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="300 " Height="300" >
                     <local:CircularProgressBar 
-                   
+                    x:Name="songProgressBarBackground"
                     SegmentColor="#FF878889" 
                     StrokeThickness="26" 
                     Percentage="100" 
                     Radius="100" 
                     Margin="0,0,0,0" 
-                    MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" 
-                    MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+                    MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp" 
+                    MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
 
                     <local:CircularProgressBar 
                     x:Name="songProgressBar"
@@ -85,13 +85,13 @@
                     SegmentColor="green" 
                     StrokeThickness="26" 
                     Margin="0,0,0,0" 
-                    MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                    MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
-                    <TextBlock x:Name="currentTrackTime" HorizontalAlignment="Left" Margin="114,271,0,0" TextWrapping="Wrap" Text="00:56" VerticalAlignment="Top" Width="71" FontSize="22" Foreground="#FFE4E4E4" TextAlignment="Center" Height="24" FontWeight="Bold"/>
-                    <TextBlock x:Name="totalTrackTime" HorizontalAlignment="Left" Margin="114,305,0,-27" TextWrapping="Wrap" Text="02:20" VerticalAlignment="Top" Width="71" FontSize="16" Foreground="#FFE4E4E4" TextAlignment="Center" Height="22"/>
+                    MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"
+                    MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
+                    <TextBlock x:Name="currentTrackTime" HorizontalAlignment="Left" Margin="114,271,0,0" TextWrapping="Wrap" Text="--:--" VerticalAlignment="Top" Width="71" FontSize="22" Foreground="#FFE4E4E4" TextAlignment="Center" Height="24" FontWeight="Bold"/>
+                    <TextBlock x:Name="totalTrackTime" HorizontalAlignment="Left" Margin="114,305,0,-27" TextWrapping="Wrap" Text="--:--" VerticalAlignment="Top" Width="71" FontSize="16" Foreground="#FFE4E4E4" TextAlignment="Center" Height="22"/>
                 </Grid>
 
-                <Image Margin="298,170,291,167" Name="playStopImage" Source="Resources/Play.png" MouseLeftButtonDown="playStopImage_MouseLeftButtonDown" Cursor="Hand"/>
+                <Image Margin="298,170,291,167" Name="playStopImage" Source="Resources/Play.png" MouseLeftButtonDown="playPauseButtonClicked" Cursor="Hand"/>
 
             </Grid>
 
@@ -100,22 +100,21 @@
             <!--User volume bar-->
             <Grid Name="userVolumeGrid" Margin="50,-40,509,1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200 " Height="200">
                 <local:CircularProgressBar 
-               
                 SegmentColor="#FF878889" 
                 StrokeThickness="26" 
                 Percentage="100" 
                 Radius="50" 
-                MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"  
-                MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+                MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"  
+                MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
 
                 <local:CircularProgressBar 
                 x:Name="userVolume"
                 Radius="50" Percentage="0" 
                 SegmentColor="#FF113A83" 
                 StrokeThickness="27" 
-                MouseDown="Ellipse_MouseDown" 
-                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp" MouseMove="Ellipse_MouseMove" 
-                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" />
+                MouseDown="progressBar_MouseDown" 
+                MouseLeftButtonUp="progressBar_MouseLeftButtonUp" MouseMove="progressBar_MouseMove" 
+                MouseLeftButtonDown="progressBar_MouseLeftButtonDown" />
 
             </Grid>
             <Image Source="Resources/userVolumeIcon.png" Margin="151,146,610,191" />
@@ -129,8 +128,8 @@
                  Percentage="100" 
                  Radius="50" 
                  Margin="0,0,0,0" 
-                 MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"    
-                 MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+                 MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"    
+                 MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown"/>
 
                 <local:CircularProgressBar
                     x:Name="othersVolume"
@@ -139,8 +138,8 @@
                 SegmentColor="#FF113A83" 
                 StrokeThickness="27" 
                 Margin="0,0,0,0" 
-                MouseDown="Ellipse_MouseDown" MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                MouseMove="Ellipse_MouseMove" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" />
+                MouseDown="progressBar_MouseDown" MouseLeftButtonUp="progressBar_MouseLeftButtonUp"
+                MouseMove="progressBar_MouseMove" MouseLeftButtonDown="progressBar_MouseLeftButtonDown" />
             </Grid>
             <Image Source="Resources/otherUsersVolumeIcon.png" Margin="607,144,146,188" />
             <Image  Margin="10,10,768,462"  x:Name="settingsIcon" Source="Resources/settings-icon.png" Stretch="UniformToFill" MouseLeftButtonDown="openSettings" Height="16" Cursor="Hand" RenderTransformOrigin="-40.219,0.125"/>

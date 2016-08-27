@@ -60,7 +60,7 @@ namespace EZDJ
                     waveOutToSkype.Play();
                     isPlaying = true;
                     rc = true;
-                    //_form.attachInputMicrophone();//reload the microphone input to sync with the audio
+                    //_form.AttachInputMicrophone();//reload the microphone input to sync with the audio
                     
                 }
                                 
@@ -148,7 +148,7 @@ namespace EZDJ
                 waveOutToSkype.Init(new SampleToWaveProvider(wavFileToSkype));
                 //waveOutToSkype.Play();
                 isPlaying = false;
-               // _form.attachInputMicrophone();//reload the microphone input to sync with the audio
+               // _form.AttachInputMicrophone();//reload the microphone input to sync with the audio
                 rc = true;
                 
 

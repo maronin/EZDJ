@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace EZDJ
 {
@@ -32,37 +33,71 @@ namespace EZDJ
         private bool _settingsOpen = false;
         private IInputElement _scrollBarSource = null;
 
-        //NAudio Varaibles
         private string filePath = null;
         public Action<float> setVolumeDelegateDAC;
         public Action<float> setVolumeDelegateDefault;
         private List<FileFormats> InputFileFormats;
         private int songNumber = 1;
+        Thread recordingThread;
+        
+        //NAudio Varaibles
         IWaveIn sourceStream = null;
         WaveOut waveOut = null;
         MusicPlayer musicPlayer;
-        Thread recordingThread;
 
 
         public MainWindow()
         {
+            //Initialize stuff.
             InitializeComponent();
+            InitializeDispatcherTimer();
+            InitializeVolumeBars();
+            InitializeFileFormats();
+            InitializeComboBoxes();
+            InitializeRecordingThread();
+            InitializeEventHandlers();
 
+            musicPlayer = new MusicPlayer(this, cbMusicOutput.SelectedIndex);
 
-            System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += playerTimer_Tick;
-            dispatcherTimer.Interval = new TimeSpan(100);
-            dispatcherTimer.Start();
+        }
 
-            CircularProgressBar userVolumeProgress = (CircularProgressBar)userVolumeGrid.Children[1];
-            CircularProgressBar othersVolumeProgress = (CircularProgressBar)othersVolumeGrid.Children[1];
-            userVolumeProgress.Percentage = othersVolumeProgress.Percentage = 25;
+        /*************************************************************************************************************
+         * Initialization.
+         *************************************************************************************************************/
 
-            InputFileFormats = new List<FileFormats>();
-            InputFileFormats.Add(new FileFormats("MP3", ".mp3"));
-            InputFileFormats.Add(new FileFormats("WAV", ".wav"));
-            InputFileFormats.Add(new FileFormats("AIFF", ".aiff"));
+        /// <summary>
+        /// Initialize event handlers for the comoboBoxes and progress bars.
+        /// </summary>
+        private void InitializeEventHandlers()
+        {
+            cbInputDevices.SelectionChanged += cbInputDevices_SelectedIndexChanged;
+            cbOutputDevices.SelectionChanged += cbOutputDevices_SelectedIndexChanged;
 
+            songProgressBar.MouseMove += songProgressBar_MouseMove;
+            songProgressBar.MouseLeftButtonDown += songProgressBar_MouseLeftButtonDown;
+            songProgressBarBackground.MouseLeftButtonDown += songProgressBar_MouseLeftButtonDown;
+            songProgressBarBackground.MouseMove += songProgressBar_MouseMove;
+
+            mainGrid.MouseMove += songProgressBar_MouseMove;
+
+            playList.MouseDoubleClick += playList_SongSelected;
+            cbMusicOutput.SelectionChanged += cbMusicOutput_SelectedIndexChanged;
+        }
+
+        /// <summary>
+        /// Initialize the recording thread for the microphone.
+        /// </summary>
+        private void InitializeRecordingThread()
+        {
+            recordingThread = new Thread(AttachInputMicrophone);
+            recordingThread.Start();
+        }
+
+        /// <summary>
+        /// Initialize the comoboBoxes for the mic input, output, and music output.
+        /// </summary>
+        private void InitializeComboBoxes()
+        {
             populateInputDevices();
             populateOutputDevices();
 
@@ -72,7 +107,6 @@ namespace EZDJ
             for (int i = 0; i < NAudio.Wave.WaveIn.DeviceCount; i++)
             {
                 sources.Add(NAudio.Wave.WaveOut.GetCapabilities(i));
-
             }
 
             cbInputDevices.SelectedIndex = EZDJ.Properties.Settings.Default.micInputIndex;
@@ -87,238 +121,6 @@ namespace EZDJ
                 cbMusicOutput.SelectedIndex = 0;
                 EZDJ.Properties.Settings.Default.micOutputIndex = 0;
                 EZDJ.Properties.Settings.Default.Save();
-            }
-
-            recordingThread = new Thread(attachInputMicrophone);
-            recordingThread.Start();
-
-            cbInputDevices.SelectionChanged += cbInputDevices_SelectedIndexChanged;
-            cbOutputDevices.SelectionChanged += cbOutputDevices_SelectedIndexChanged;
-            songProgressBar.MouseMove += songProgressBar_MouseMove;
-            songProgressBar.MouseLeftButtonDown += songProgressBar_MouseLeftButtonDown;
-
-            //initialize browser youtube stuff here.
-            /*
-            webClient = new WebClient();
-            browser = new WebBrowser();
-            browser.Navigate("http://www.youtube-mp3.org/");
-            browser.DocumentCompleted += browser_DocumentCompleted;
-            browser.ScriptErrorsSuppressed = true;
-            tbYoutubeAddURL.KeyUp += tbYoutubeAddURL_KeyUp;
-            //loadingIcon.Image = Image.FromFile(@"C:\Users\Mark\Documents\Visual Studio 2013\Projects\YouTube to MP3\images\loading.gif");
-            */
-
-            musicPlayer = new MusicPlayer(this, cbMusicOutput.SelectedIndex);
-            //youTubeDownloader = new YouTubeDownloader(this, musicPlayer);
-
-            //volumeSlider.Volume = (float)0.254;
-
-            playList.MouseDoubleClick += playList_SongSelected;
-            cbMusicOutput.SelectionChanged += cbMusicOutput_SelectedIndexChanged;
-        }
-
-
-        private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            //Enable moving mouse to change the value.
-            _isPressed = true;
-            _scrollBarSource = (IInputElement)e.Source;
-            setProgressBarPercentage();
-        }
-
-        private void Ellipse_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            //Disable moving mouse to change the value.
-            _isPressed = false;
-            _scrollBarSource = null;
-        }
-
-        private void Ellipse_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isPressed)
-            {
-                setProgressBarPercentage();
-            }
-        }
-
-        public void setProgressBarPercentage()
-        {
-            CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
-            Grid barParentGrid = (Grid)bar.Parent;
-            CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
-
-            double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
-            progressBar.Percentage = (100) * angle / (2 * Math.PI);
-
-        }
-
-        public void songProgressBar_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isPressed)
-            {
-                setProgressBarTime();
-            }
-        }
-
-        public void songProgressBar_MouseLeftButtonDown(object sender, MouseEventArgs e)
-        {
-            setProgressBarTime();
-        }
-
-        public void setProgressBarTime()
-        {
-            songProgressBar.timeProgress = (songProgressBar.Percentage / 100) * musicPlayer.getTotalSongSeconds();
-            if (musicPlayer.streamExists())
-            {
-                musicPlayer.setCurrentTime(songProgressBar.timeProgress);
-            }
-        }
-
-        private void Ellipse_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            _isPressed = true;
-
-            CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
-            Grid barParentGrid = (Grid)bar.Parent;
-            CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
-            double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
-            progressBar.Percentage = (100) * angle / (2 * Math.PI);
-        }
-
-        private void playStopImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
-            if (!_isPlaying)
-            {
-                activatePlayButton();
-                btnPlay_Click(sender, e);
-            }
-            else
-            {
-                musicPlayer.pause();
-                activatePauseButton();
-
-            }
-        }
-        private void btnPlay_Click(object sender, EventArgs e)
-        {
-            if (musicPlayer.play())
-            {
-                totalTrackTime.Text = String.Format("{0:00}:{1:00}", (int)musicPlayer.getWaveStream("dac").TotalTime.TotalMinutes, musicPlayer.getWaveStream("dac").TotalTime.Seconds);
-                activatePlayButton();
-                setDefaultVolume((float)userVolume.Percentage / 100, (float)othersVolume.Percentage / 100);
-            }
-
-        }
-        private void activatePauseButton()
-        {
-            playStopImage.Source = new BitmapImage(new Uri(@"Resources/Play.png", UriKind.RelativeOrAbsolute));
-            _isPlaying = false;
-        }
-
-        private void activatePlayButton()
-        {
-            playStopImage.Source = new BitmapImage(new Uri(@"Resources/Pause.png", UriKind.RelativeOrAbsolute));
-            _isPlaying = true;
-        }
-
-        public static double GetAngleR(Point pos, double radius)
-        {
-            //Calculate out the distance(r) between the center and the position
-            Point center = new Point(radius, radius);
-            double xDiff = center.X - pos.X;
-            double yDiff = center.Y - pos.Y;
-            double r = Math.Sqrt(xDiff * xDiff + yDiff * yDiff);
-
-            //Calculate the angle
-            double angle = Math.Acos((center.Y - pos.Y) / r);
-            if (pos.X < radius)
-                angle = 2 * Math.PI - angle;
-            if (Double.IsNaN(angle))
-                return 0.0;
-            else
-                return angle;
-        }
-
-        /// <summary>
-        /// Drag the window when the mouse button is down anywhere on the grid
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void myGrid_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-
-            if (e.Source is Grid)
-            {
-                Grid sourceGrid = (Grid)e.Source;
-                if (sourceGrid.Name == "mainGrid")
-                    if (e.ChangedButton == MouseButton.Left)
-                        this.DragMove();
-            }
-        }
-
-        private void closeApp(object sender, MouseButtonEventArgs e)
-        {
-            Application.Current.Shutdown(0);
-            Environment.Exit(0);
-
-        }
-
-        private void openSettings(object sender, MouseButtonEventArgs e)
-        {
-            if (!_settingsOpen)
-            {
-                settingsIcon.Source = new BitmapImage(new Uri(@"Resources/backArrow.png", UriKind.RelativeOrAbsolute));
-                _settingsOpen = true;
-                showSettings();
-            }
-            else
-            {
-                settingsIcon.Source = new BitmapImage(new Uri(@"Resources/settings-icon.png", UriKind.RelativeOrAbsolute));
-                _settingsOpen = false;
-                hideSettings();
-
-            }
-        }
-
-        private void showSettings()
-        {
-            settingsGrid.Visibility = Visibility.Visible;
-        }
-
-        private void hideSettings()
-        {
-            settingsGrid.Visibility = Visibility.Collapsed;
-        }
-
-
-
-        private void playList_SongSelected(object sender, MouseEventArgs e)
-        {
-            Point pt = e.GetPosition(playList);
-            HitTestResult hit = VisualTreeHelper.HitTest(playList, pt);
-
-            //ListViewHitTestInfo hit = playList.HitTest(e.Location);
-            if (hit != null)
-            {
-
-                int songNumber = playList.SelectedIndex;
-                musicPlayer.loadSongBySongNumber(songNumber);
-                btnPlay_Click(sender, e);
-
-                setDefaultVolume((float)userVolume.Percentage / 100, (float)othersVolume.Percentage / 100);
-            };
-        }
-
-        private void setDefaultVolume(float volume, float volume2)
-        {
-            if (setVolumeDelegateDAC != null)
-            {
-                setVolumeDelegateDAC(volume2);
-            }
-            if (setVolumeDelegateDefault != null)
-            {
-                setVolumeDelegateDefault(volume);
             }
         }
 
@@ -380,22 +182,367 @@ namespace EZDJ
         }
 
         /// <summary>
+        /// Initialize the allowed file formats to be played by this players.
+        /// </summary>
+        private void InitializeFileFormats()
+        {
+            InputFileFormats = new List<FileFormats>();
+            InputFileFormats.Add(new FileFormats("MP3", ".mp3"));
+            InputFileFormats.Add(new FileFormats("WAV", ".wav"));
+            InputFileFormats.Add(new FileFormats("AIFF", ".aiff"));
+        }
+
+        /// <summary>
+        /// Initialize the volume bars to 25%
+        /// </summary>
+        private void InitializeVolumeBars()
+        {
+            CircularProgressBar userVolumeProgress = (CircularProgressBar)userVolumeGrid.Children[1];
+            CircularProgressBar othersVolumeProgress = (CircularProgressBar)othersVolumeGrid.Children[1];
+            userVolumeProgress.Percentage = othersVolumeProgress.Percentage = 25;
+        }
+
+        /// <summary>
+        /// Starts the disaptcher timer, that fires every 100ms. 
+        /// For every tick, call playerTimer_Tick;
+        /// </summary>
+        private void InitializeDispatcherTimer()
+        {
+            System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += playerTimer_Tick;
+            dispatcherTimer.Interval = new TimeSpan(100);
+            dispatcherTimer.Start();
+        }
+
+        /*************************************************************************************************************
+         * Event Handlers.
+         *************************************************************************************************************/
+
+        /// <summary>
+        /// Handles the event when the mouse left button is clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void progressBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //Enable moving mouse to change the value.
+            _isPressed = true;
+            _scrollBarSource = (IInputElement)e.Source;
+            setProgressBarPercentage();
+        }
+
+        /// <summary>
+        /// Mouse has stopped clicking on the progress bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void progressBar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            //Disable moving mouse to change the value.
+            _isPressed = false;
+            _scrollBarSource = null;
+        }
+
+        /// <summary>
+        /// The mouse is moving on the progress bar. If it's pressed, set the percentage.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void progressBar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isPressed)
+            {
+                setProgressBarPercentage();
+            }
+        }
+
+        /// <summary>
+        /// Set the progress bar percentage. (Applies to both the song tracker and the volume bars)
+        /// </summary>
+        public void setProgressBarPercentage()
+        {
+            CircularProgressBar bar = (CircularProgressBar)_scrollBarSource;
+            Grid barParentGrid = (Grid)bar.Parent;
+            CircularProgressBar progressBar = (CircularProgressBar)barParentGrid.Children[1];
+
+            double angle = GetAngleR(Mouse.GetPosition(_scrollBarSource), bar.Radius + bar.StrokeThickness * 2);
+            progressBar.Percentage = (100) * angle / (2 * Math.PI);
+
+        }
+
+        /// <summary>
+        /// Set the progress bar time when the mouse is moved and pressed on the song tracker.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void songProgressBar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isPressed)
+            {
+                setProgressBarTime();
+            }
+        }
+
+        /// <summary>
+        /// Set the progress bar time when the left mouse button has been clicked on the progress bar.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void songProgressBar_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            setProgressBarTime();
+        }
+
+        /// <summary>
+        /// Set the song progress bar to the proper time based on the percentage.
+        /// </summary>
+        public void setProgressBarTime()
+        {
+            songProgressBar.timeProgress = (songProgressBar.Percentage / 100) * musicPlayer.getTotalSongSeconds();
+            if (musicPlayer.streamExists())
+            {
+                musicPlayer.setCurrentTime(songProgressBar.timeProgress);
+            }
+        }
+
+        /// <summary>
+        /// The mouse is pressed down, set local varaible to true and set the percentage.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void progressBar_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _isPressed = true;
+            setProgressBarPercentage();
+        }
+
+        /// <summary>
+        /// The play/pause button has been clicked. Either pause or play the current song, depending if the current song is playing or not.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void playPauseButtonClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isPlaying)
+            {
+                activatePlayButton();
+                playBtnClicked(sender, e);
+            }
+            else
+            {
+                musicPlayer.pause();
+                activatePauseButton();
+            }
+        }
+
+        /// <summary>
+        /// The play button has been clicked. Play the song!
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void playBtnClicked(object sender, EventArgs e)
+        {
+            if (musicPlayer.play())
+            {
+                totalTrackTime.Text = String.Format("{0:00}:{1:00}", (int)musicPlayer.getWaveStream("dac").TotalTime.TotalMinutes, musicPlayer.getWaveStream("dac").TotalTime.Seconds);
+                activatePlayButton();
+                setDefaultVolume((float)userVolume.Percentage / 100, (float)othersVolume.Percentage / 100);
+            }
+
+        }
+
+        /// <summary>
+        /// Drag the window when the mouse button is down anywhere on the grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void myGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+            if (e.Source is Grid)
+            {
+                Grid sourceGrid = (Grid)e.Source;
+                if (sourceGrid.Name == "mainGrid")
+                    if (e.ChangedButton == MouseButton.Left)
+                        this.DragMove();
+            }
+        }
+
+        /// <summary>
+        /// A song has been selected from the listview by a double click.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void playList_SongSelected(object sender, MouseEventArgs e)
+        {
+            Point pt = e.GetPosition(playList);
+            HitTestResult hit = VisualTreeHelper.HitTest(playList, pt);
+
+            //ListViewHitTestInfo hit = playList.HitTest(e.Location);
+            if (hit != null)
+            {
+                int songNumber = playList.SelectedIndex;
+                musicPlayer.loadSongBySongNumber(songNumber);
+                playBtnClicked(sender, e);
+
+                setDefaultVolume((float)userVolume.Percentage / 100, (float)othersVolume.Percentage / 100);
+            };
+        }
+        /// <summary>
+        /// The combo box for the music output has been changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbMusicOutput_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            musicPlayer.virtualCableDeviceNumber = cbMusicOutput.SelectedIndex;
+            musicPlayer.loadSongBySongNumber(musicPlayer.currentSongNumber);
+            EZDJ.Properties.Settings.Default.micOutputIndex = cbMusicOutput.SelectedIndex;
+            EZDJ.Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// The combo box for the output device has been changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void cbOutputDevices_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            recordingThread = new Thread(AttachInputMicrophone);
+            recordingThread.Start();
+
+            EZDJ.Properties.Settings.Default.micOutputIndex = cbOutputDevices.SelectedIndex;
+            EZDJ.Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// When the combo box is changed, change the recording thread to a new one. 
+        /// Also save the choice for when the program is opened again.
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">Event argument</param>
+        public void cbInputDevices_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            recordingThread = new Thread(AttachInputMicrophone);
+            recordingThread.Start();
+
+            EZDJ.Properties.Settings.Default.micInputIndex = cbInputDevices.SelectedIndex;
+            EZDJ.Properties.Settings.Default.Save();
+        }
+
+        /*************************************************************************************************************
+         * Methods.
+         *************************************************************************************************************/
+
+        /// <summary>
+        /// Make the pause button active. 
+        /// </summary>
+        private void activatePauseButton()
+        {
+            playStopImage.Source = new BitmapImage(new Uri(@"Resources/Play.png", UriKind.RelativeOrAbsolute));
+            _isPlaying = false;
+        }
+
+        /// <summary>
+        /// Make the play button active.
+        /// </summary>
+        private void activatePlayButton()
+        {
+            playStopImage.Source = new BitmapImage(new Uri(@"Resources/Pause.png", UriKind.RelativeOrAbsolute));
+            _isPlaying = true;
+        }
+
+        /// <summary>
+        /// Get the angle of where the progress bar should be based on the position and radius of the progress bar.
+        /// </summary>
+        /// <param name="pos">Position of where the mouse was clicked</param>
+        /// <param name="radius">Radius of the progress bar</param>
+        /// <returns></returns>
+        public static double GetAngleR(Point pos, double radius)
+        {
+            //Calculate out the distance(r) between the center and the position
+            Point center = new Point(radius, radius);
+            double xDiff = center.X - pos.X;
+            double yDiff = center.Y - pos.Y;
+            double r = Math.Sqrt(xDiff * xDiff + yDiff * yDiff);
+
+            //Calculate the angle
+            double angle = Math.Acos((center.Y - pos.Y) / r);
+            if (pos.X < radius)
+                angle = 2 * Math.PI - angle;
+            if (Double.IsNaN(angle))
+                return 0.0;
+            else
+                return angle;
+        }
+
+
+
+        /// <summary>
+        /// Open the settings grid which overlays on top of everything.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void openSettings(object sender, MouseButtonEventArgs e)
+        {
+            if (!_settingsOpen)
+            {
+                settingsIcon.Source = new BitmapImage(new Uri(@"Resources/backArrow.png", UriKind.RelativeOrAbsolute));
+                _settingsOpen = true;
+                showSettings();
+            }
+            else
+            {
+                settingsIcon.Source = new BitmapImage(new Uri(@"Resources/settings-icon.png", UriKind.RelativeOrAbsolute));
+                _settingsOpen = false;
+                hideSettings();
+
+            }
+        }
+
+        /// <summary>
+        /// Show the settings grid.
+        /// </summary>
+        private void showSettings()
+        {
+            settingsGrid.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// Hide the settings grid.
+        /// </summary>
+        private void hideSettings()
+        {
+            settingsGrid.Visibility = Visibility.Collapsed;
+        }
+
+
+        /// <summary>
+        /// Set the volume for the dac and current default output sound device. 
+        /// </summary>
+        /// <param name="volume"></param>
+        /// <param name="volume2"></param>
+        private void setDefaultVolume(float volume, float volume2)
+        {
+            if (setVolumeDelegateDAC != null)
+            {
+                setVolumeDelegateDAC(volume2);
+            }
+            if (setVolumeDelegateDefault != null)
+            {
+                setVolumeDelegateDefault(volume);
+            }
+        }
+
+
+
+
+        /// <summary>
         /// Stop all playback and recording of the mixer. Switch to the new input device and start recording.
         /// </summary>
-        public void attachInputMicrophone()
+        public void AttachInputMicrophone()
         {
-            if (waveOut != null)
-            {
-                waveOut.Stop();
-                waveOut.Dispose();
-                waveOut = null;
-            }
-            if (sourceStream != null)
-            {
-                sourceStream.StopRecording();
-                sourceStream.Dispose();
-                sourceStream = null;
-            }
+            InitializeWaveOutWaveIn();
 
             System.Threading.Thread.Sleep(300);//to prevent looping of sound when switching to the virtual audio cable
 
@@ -411,13 +558,6 @@ namespace EZDJ
                 deviceNumber = cbInputDevices.SelectedIndex;
             }
 
-            // int deviceNumber = cbInputDevices.SelectedIndex;
-
-            //get the selected input device
-            // sourceStream = new WaveIn();
-            //sourceStream.DeviceNumber = deviceNumber;
-            //sourceStream.WaveFormat = new NAudior.Wave.WaveFormat(96000, NAudio.Wave.WaveIn.GetCapabilities(deviceNumber).Channels);
-            //sourceStream.WaveFormat = new WaveFormat(16000, 1);
             if (deviceNumber == -1)
             {
                 sourceStream = new WasapiCapture((MMDevice)cbInputDevices.Items[0]);
@@ -437,16 +577,11 @@ namespace EZDJ
 
             }
 
-            //sourceStream.WaveFormat = new WaveFormat(8000, 2);
-
             //set the input waveIn to the input device selected
             WaveInProvider waveIn = new WaveInProvider(sourceStream);
 
-
-            //waveOut = new NAudio.Wave.DirectSoundOut();
-
             //waveOut = Where the mic output will go
-            waveOut = new WaveOut();
+
             if (!cbOutputDevices.Dispatcher.CheckAccess())
             {
                 Action action = () => waveOut.DeviceNumber = cbOutputDevices.SelectedIndex; ;
@@ -461,45 +596,41 @@ namespace EZDJ
             waveOut.DesiredLatency = 120;
             waveOut.Init(waveIn);
 
-
             waveOut.Play();
             sourceStream.StartRecording();
 
         }
 
-        private void cbMusicOutput_SelectedIndexChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Initialize the wave out and wave in devices.
+        /// </summary>
+        private void InitializeWaveOutWaveIn()
         {
-            musicPlayer.virtualCableDeviceNumber = cbMusicOutput.SelectedIndex;
-            musicPlayer.loadSongBySongNumber(musicPlayer.currentSongNumber);
-            EZDJ.Properties.Settings.Default.micOutputIndex = cbMusicOutput.SelectedIndex;
-            EZDJ.Properties.Settings.Default.Save();
+            if (waveOut != null)
+            {
+                waveOut.Stop();
+                waveOut.Dispose();
+                waveOut = null;
 
+            }
+            if (sourceStream != null)
+            {
+                sourceStream.StopRecording();
+                sourceStream.Dispose();
+                sourceStream = null;
+            }
+            waveOut = new WaveOut();
         }
 
-        void cbOutputDevices_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            recordingThread = new Thread(attachInputMicrophone);
-            recordingThread.Start();
-
-            EZDJ.Properties.Settings.Default.micOutputIndex = cbOutputDevices.SelectedIndex;
-            EZDJ.Properties.Settings.Default.Save();
-        }
+        /*************************************************************************************************************
+         * Helper Methods.
+         *************************************************************************************************************/
 
         /// <summary>
-        /// When the combo box is changed, change the recording thread to a new one. 
-        /// Also save the choice for when the program is opened again.
+        /// Convert nano seconds to millisconds.
         /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">Event argument</param>
-        public void cbInputDevices_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            recordingThread = new Thread(attachInputMicrophone);
-            recordingThread.Start();
-
-            EZDJ.Properties.Settings.Default.micInputIndex = cbInputDevices.SelectedIndex;
-            EZDJ.Properties.Settings.Default.Save();
-        }
-
+        /// <param name="nanoseconds"></param>
+        /// <returns></returns>
         public static double Convert100NanosecondsToMilliseconds(double nanoseconds)
         {
             // One million nanoseconds in 1 millisecond, 
@@ -507,6 +638,11 @@ namespace EZDJ
             return nanoseconds * 0.0001;
         }
 
+        /// <summary>
+        /// The open file/song button has been clicked. Open up a file dialogue and process the file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -525,29 +661,28 @@ namespace EZDJ
 
                 ShellFile so = ShellFile.FromFilePath(filePath);
                 double nanoseconds;
-                double.TryParse(so.Properties.System.Media.Duration.Value.ToString(),
-                out nanoseconds);
+                double.TryParse(so.Properties.System.Media.Duration.Value.ToString(), out nanoseconds);
                 Console.WriteLine("NanaoSeconds: {0}", nanoseconds);
-                //if (nanoseconds > 0)
-                //{
+
                 double seconds = Convert100NanosecondsToMilliseconds(nanoseconds) / 1000;
                 TimeSpan t = TimeSpan.FromSeconds(seconds);
 
                 string duration = t.ToString(@"mm\:ss");
                 string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-                //}
 
                 Song songToAdd = new Song(fileName, null, duration, filePath, true, songNumber);
 
-                //musicPlayer.loadSong(fileName);
                 musicPlayer.addSong(songToAdd);
                 addSongToPlayList(songToAdd);
 
-
             }
-            // attachInputMicrophone();
+
         }
 
+        /// <summary>
+        /// Add the song to the current song playist.
+        /// </summary>
+        /// <param name="songToAdd">The song you want to add to the playlist.</param>
         public void addSongToPlayList(Song songToAdd)
         {
             ListViewItem songItem = new ListViewItem();
@@ -563,26 +698,16 @@ namespace EZDJ
                 playList.Items.Add(songItem);
             }
 
-            //tbYoutubeAddURL.Text = "";
             songNumber++;
-
-            /*
-            if (songToAdd.imageURL != null)
-            {
-                picYouTubePicture.ImageLocation = songToAdd.imageURL;
-            }
-            else
-            {
-                picYouTubePicture.ImageLocation = "";
-            }
-            */
-
-            //setProgressBarState(false);
-            //setLoadingIconState(false);
 
         }
 
 
+        /// <summary>
+        /// The tick timer. It checks and updates the progress bar's percentage whether or not the song should be stopped
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void playerTimer_Tick(object sender, EventArgs e)
         {
             //if (waveOutToMe != null && fileWaveStreamDAC != null && waveOutToSkype != null)
@@ -602,14 +727,25 @@ namespace EZDJ
                     songProgressBar.Percentage = percentage;
                     songProgressBar.timeProgress = elapsedTime.TotalSeconds;
                     currentTrackTime.Text = String.Format("{0:00}:{1:00}", (int)elapsedTime.TotalMinutes, elapsedTime.Seconds);
-                    
+
                 }
             }
             else
             {
-                songProgressBar.Percentage= 0;
+                songProgressBar.Percentage = 0;
                 activatePauseButton();
             }
+        }
+
+        /// <summary>
+        /// The app is being closed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void closeApp(object sender, MouseButtonEventArgs e)
+        {
+            Process.GetCurrentProcess().Kill();
+            Application.Current.Shutdown();
         }
 
         ~MainWindow()
