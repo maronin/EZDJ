@@ -9,10 +9,19 @@ This is a project that was inspired by wanting to share music with my friends wh
 This project was particularly challenging, as it involved figuring out a way to mix two input sources (my microphone and the music I was playing) into one source (what my friends where hearing) and at the same time, outputting the music to myself as well.
 
 ## Instructions on how to use
+
 ### Adding songs
-Click on the 'note' and 'plus' icon located on the middle right side of the application.
+Click on the 'note' and 'plus' icon located on the middle right side of the application. Proceed to add songs (Supports: .wave, .mp3, .aiff).
+
+### Playing song
+Once the songs have been added, they will be displayed at the bottom of the application. Scroll up or down to view your tracks if you have more than at least 14 songs. To play the track, simply double click the song you want to play. 
+
 ### Changing volume
-Move the ciruclar blue bars to adjust volume. The one located on the left is how loud the volume is for you. The one located on the right is the volume for others.
+Move the circular blue bars to adjust volume. The one located on the left is how loud the volume is for you. The one located on the right is the volume for others.
+
+### Seek track
+The large circular green bar in the middle is used to seek the current song. Click anywhere along the circle or drag accordingly. 
+
 ### Setup sources
 You'll need to download [Virtual Audio Cable](http://software.muzychenko.net/eng/vac.htm) in order for this set up to work. Once you've installed virtual audio cable, you can follow the setup below.
 
