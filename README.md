@@ -23,11 +23,11 @@ Move the circular blue bars to adjust volume. The one located on the left is how
 The large circular green bar in the middle is used to seek the current song. Click anywhere along the circle or drag accordingly. 
 
 ### Setup sources
-You'll need to download [Virtual Audio Cable](http://software.muzychenko.net/eng/vac.htm) in order for this set up to work. Once you've installed virtual audio cable, you can follow the setup below.
+In order for this to work and be able to mix your mic and music to a single output source, you'll need to download [Virtual Audio Cable](http://software.muzychenko.net/eng/vac.htm). Once you've installed virtual audio cable, you can follow the setup below.
 
 - Set the **input** to your mic
-- The **output** to your _Virtual Audio Cable (Line 1)_ 
-- The **music output** to _Virtual Audio Cable (Line 1)_
+- The **output** to your _Virtual Audio Cable (eg. Line 1)_ 
+- The **music output** to _Virtual Audio Cable (eg. Line 1)_
 
 For the application you are going to use to communicate with your freinds (Skype, Discord, etc.), select Line 1 as your input source.
 
