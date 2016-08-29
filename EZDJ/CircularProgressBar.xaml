@@ -1,4 +1,5 @@
-﻿<UserControl x:Class="EZDJ.CircularProgressBar"
+﻿<!--Code used and modified from: http://timokorinth.de/creating-circular-progress-bar-wpf-silverlight/-->
+<UserControl x:Class="EZDJ.CircularProgressBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

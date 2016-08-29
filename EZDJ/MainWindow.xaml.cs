@@ -321,14 +321,16 @@ namespace EZDJ
         private void playPauseButtonClicked(object sender, MouseButtonEventArgs e)
         {
             if (!_isPlaying)
-            {
-                activatePlayButton();
+            {                
+                playStopImage.Source = new BitmapImage(new Uri(@"Resources/Pause.png", UriKind.RelativeOrAbsolute));
+                _isPlaying = true;
                 playBtnClicked(sender, e);
             }
             else
             {
                 musicPlayer.pause();
-                activatePauseButton();
+                playStopImage.Source = new BitmapImage(new Uri(@"Resources/Play.png", UriKind.RelativeOrAbsolute));
+                _isPlaying = false;
             }
         }
 
@@ -342,7 +344,7 @@ namespace EZDJ
             if (musicPlayer.play())
             {
                 totalTrackTime.Text = String.Format("{0:00}:{1:00}", (int)musicPlayer.getWaveStream("dac").TotalTime.TotalMinutes, musicPlayer.getWaveStream("dac").TotalTime.Seconds);
-                activatePlayButton();
+                _isPlaying = true;
                 setDefaultVolume((float)userVolume.Percentage / 100, (float)othersVolume.Percentage / 100);
             }
 
@@ -430,24 +432,6 @@ namespace EZDJ
         /*************************************************************************************************************
          * Methods.
          *************************************************************************************************************/
-
-        /// <summary>
-        /// Make the pause button active. 
-        /// </summary>
-        private void activatePauseButton()
-        {
-            playStopImage.Source = new BitmapImage(new Uri(@"Resources/Play.png", UriKind.RelativeOrAbsolute));
-            _isPlaying = false;
-        }
-
-        /// <summary>
-        /// Make the play button active.
-        /// </summary>
-        private void activatePlayButton()
-        {
-            playStopImage.Source = new BitmapImage(new Uri(@"Resources/Pause.png", UriKind.RelativeOrAbsolute));
-            _isPlaying = true;
-        }
 
         /// <summary>
         /// Get the angle of where the progress bar should be based on the position and radius of the progress bar.
@@ -647,30 +631,45 @@ namespace EZDJ
             //string allExtensions = string.Join(";", (from f in InputFileFormats select "*" + f.Extension).ToArray());
             openFileDialog.Filter = String.Format("All Supported Files|{0}|All Files (*.*)|*.*", allExtensions);
             openFileDialog.FilterIndex = 1;
+            openFileDialog.Multiselect = true;
 
             bool? result = openFileDialog.ShowDialog();
             if (result ?? false)
             {
                 // Filename to process was passed to RunWorkerAsync(), so it's available
                 // here in DoWorkEventArgs object.
-                filePath = openFileDialog.FileName;
+
+                foreach (String file in openFileDialog.FileNames)
+                {
+                    try
+                    {
+                        filePath = file;
+
+                        ShellFile so = ShellFile.FromFilePath(filePath);
+                        double nanoseconds;
+                        double.TryParse(so.Properties.System.Media.Duration.Value.ToString(), out nanoseconds);
+                        Console.WriteLine("NanaoSeconds: {0}", nanoseconds);
+
+                        double seconds = Convert100NanosecondsToMilliseconds(nanoseconds) / 1000;
+                        TimeSpan t = TimeSpan.FromSeconds(seconds);
+
+                        string duration = t.ToString(@"mm\:ss");
+                        string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+                        Song songToAdd = new Song(fileName, null, duration, filePath, true, songNumber);
+
+                        musicPlayer.addSong(songToAdd);
+                        addSongToPlayList(songToAdd);
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
 
 
-                ShellFile so = ShellFile.FromFilePath(filePath);
-                double nanoseconds;
-                double.TryParse(so.Properties.System.Media.Duration.Value.ToString(), out nanoseconds);
-                Console.WriteLine("NanaoSeconds: {0}", nanoseconds);
 
-                double seconds = Convert100NanosecondsToMilliseconds(nanoseconds) / 1000;
-                TimeSpan t = TimeSpan.FromSeconds(seconds);
-
-                string duration = t.ToString(@"mm\:ss");
-                string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-
-                Song songToAdd = new Song(fileName, null, duration, filePath, true, songNumber);
-
-                musicPlayer.addSong(songToAdd);
-                addSongToPlayList(songToAdd);
 
             }
 
@@ -707,7 +706,7 @@ namespace EZDJ
         /// <param name="e"></param>
         private void playerTimer_Tick(object sender, EventArgs e)
         {
-            //if (waveOutToMe != null && fileWaveStreamDAC != null && waveOutToSkype != null)
+
             if (musicPlayer.streamExists() && musicPlayer.getPlaybackState() != PlaybackState.Stopped)
             {
                 TimeSpan elapsedTime = (musicPlayer.getPlaybackState() == PlaybackState.Stopped) ? TimeSpan.Zero : musicPlayer.getCurrentSongTime();
@@ -730,7 +729,8 @@ namespace EZDJ
             else
             {
                 songProgressBar.Percentage = 0;
-                activatePauseButton();
+
+                _isPlaying = false;
             }
         }
 
